@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.4-apache
 
 MAINTAINER Rafael Corrêa Gomes <rafaelcgstz@gmail.com>
 
@@ -13,16 +13,18 @@ RUN apt-get update \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	libfreetype6-dev \
 	libicu-dev \
-  libssl-dev \
+    libssl-dev \
 	libjpeg62-turbo-dev \
 	libmcrypt-dev \
 	libedit-dev \
 	libedit2 \
 	libxslt1-dev \
+	libonig-dev \
+    libzip-dev \
+    libfreetype6-dev \
 	apt-utils \
 	gnupg \
 	redis-tools \
-	mysql-client \
 	git \
 	vim \
 	wget \
@@ -38,18 +40,18 @@ RUN apt-get update \
 # Install Magento Dependencies
 
 RUN docker-php-ext-configure \
-  	gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/; \
+  	gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/; \
   	docker-php-ext-install \
   	opcache \
   	gd \
   	bcmath \
   	intl \
   	mbstring \
-  	mcrypt \
   	pdo_mysql \
   	soap \
   	xsl \
-  	zip
+  	zip \
+  	sockets
 
 # Install oAuth
 
@@ -57,21 +59,14 @@ RUN apt-get update \
   	&& apt-get install -y \
   	libpcre3 \
   	libpcre3-dev \
-  	# php-pear \
   	&& pecl install oauth \
   	&& echo "extension=oauth.so" > /usr/local/etc/php/conf.d/docker-php-ext-oauth.ini
-
-# Install Node, NVM, NPM and Grunt
-
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
-  	&& apt-get install -y nodejs build-essential \
-    && curl https://raw.githubusercontent.com/creationix/nvm/v0.16.1/install.sh | sh \
-    && npm i -g grunt-cli yarn
 
 # Install Composer
 
 RUN	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
-RUN composer global require hirak/prestissimo
+RUN composer self-update 1.10.13
+#RUN composer global require hirak/prestissimo
 
 # Install Code Sniffer
 

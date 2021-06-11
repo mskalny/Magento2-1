@@ -70,6 +70,21 @@ services:
     networks:
       - <project_name>-network
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.1
+    environment:
+      - node.name=es01
+      - cluster.initial_master_nodes=es01
+      - discovery.seed_hosts=es01
+      - cluster.name=docker-cluster
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ./elasticsearchdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - <project_name>-network
+
 networks:
   <project_name>-network:
     driver: bridge
